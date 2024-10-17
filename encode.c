@@ -1,4 +1,7 @@
-#include <stdio.h>
+#include "types.h"
+#include "stat.h"
+#include "fcntl.h"
+#include "user.h"
 
 void encode(char text[]) {
     for (int i = 0; text[i] != '\0'; ++i) {
@@ -12,11 +15,11 @@ void encode(char text[]) {
 
 int main() {
     char text[100] ;
-    gets(text);
+    gets(text,sizeof(text));
     encode(text);
-    FILE *f;
-    f = fopen("result.txt" , "w" );
-    fprintf(f,text);
-    fclose(f);
+    int f ;
+    f = open("result.txt",O_CREATE|O_RDWR);
+    write(f,text,strlen(text));
+    close(f);
     return 0;
 }
