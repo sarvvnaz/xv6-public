@@ -15,7 +15,7 @@ main(int argc, char *argv[])
 	    if ((argv[i][j] >= 'A' && argv[i][j] <= 'Z') || (argv[i][j] >= 'a' && argv[i][j] <= 'z'))
 	    	{
 	    		char base = (argv[i][j] >= 'A' && argv[i][j] <= 'Z') ? 'A' : 'a';
-	    		argv[i][j] = (argv[i][j] - base + 11) %26 + base;
+	    		argv[i][j] = (argv[i][j] - base + 15) %26 + base;
 	    	}
 	    }
   }
