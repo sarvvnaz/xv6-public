@@ -20,11 +20,13 @@ main(int argc, char *argv[])
 	    }
   }
   int f ;
+  unlink("result.txt");
   f = open("result.txt",O_CREATE|O_RDWR);
   int k;
   for(k = 1; k < argc; k++){
 	  write(f,argv[k],strlen(argv[k]));
  	 write(f," ",1);}
+  write(f,"\n",1);
   close(f);
   exit();
 }
