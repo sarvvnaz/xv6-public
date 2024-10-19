@@ -14,15 +14,30 @@
 #include "mmu.h"
 #include "proc.h"
 #include "x86.h"
+#define leftarrow 0xe4
+#define rightarrow 0xe5
+#define left 1
+#define right 0
+#define NUMCOL 80
+#define NUMROW 25
+#define INPUT_BUF 128
 
 static void consputc(int);
-
+static int capacity = 0;
 static int panicked = 0;
+
+static struct {
+  char buf[INPUT_BUF];
+  int len;
+  int copying;  // Flag to indicate if we're currently copying
+} clipboard;
 
 static struct {
   struct spinlock lock;
   int locking;
 } cons;
+
+
 
 static void
 printint(int xx, int base, int sign)
@@ -213,11 +228,44 @@ consoleintr(int (*getc)(void))
         consputc(BACKSPACE);
       }
       break;
+    case leftarrow : //leftarrow
+      if(input.e > input.r) {
+        setcursor(left);
+      }
+      break;
+    case rightarrow : //rightarrow
+        setcursor(right);
+      
+      break;
+
+    case C('S'):  // Start copying to clipboard
+      clipboard.len = 0;
+      clipboard.copying = 1;
+      break;
+    case C('F'):  // Stop copying and paste
+      if (clipboard.copying) {
+        clipboard.copying = 0;
+        // Paste the clipboard contents
+        for (int i = 0; i < clipboard.len; i++) {
+          if (input.e-input.r < INPUT_BUF) {
+            c = clipboard.buf[i];
+            input.buf[input.e++ % INPUT_BUF] = c;
+            consputc(c);
+          }
+        }
+      }
+      break;
     default:
+      if (c == '\n') {
+        capacity =0;
+      }
       if(c != 0 && input.e-input.r < INPUT_BUF){
         c = (c == '\r') ? '\n' : c;
         input.buf[input.e++ % INPUT_BUF] = c;
         consputc(c);
+        if (clipboard.copying && clipboard.len < INPUT_BUF) {
+          clipboard.buf[clipboard.len++] = c;
+        }
         if(c == '\n' || c == C('D') || input.e == input.r+INPUT_BUF){
           input.w = input.e;
           wakeup(&input.r);
@@ -297,3 +345,32 @@ consoleinit(void)
   ioapicenable(IRQ_KBD, 0);
 }
 
+void
+setcursor(int direction)
+{
+    int pos ;
+    outb(CRTPORT,14);
+    pos = inb(CRTPORT+1) << 8;
+    outb(CRTPORT, 15);
+    pos |= inb(CRTPORT+1) ;
+    int current_row = NUMCOL * (pos / NUMCOL) + 2;
+    int current_col = ((((int)pos / NUMCOL) + 1) * NUMCOL - 1);
+    if (direction == left) {
+      if (crt[pos -2] != (('$' & 0xff) | 0x0700)) {
+        pos--;
+        capacity++;
+        }
+    }
+    else if (direction == right && capacity > 0) {
+      if (pos < current_col) {
+        pos++;
+        capacity --;
+        }
+        }
+    outb(CRTPORT,14);
+    outb(CRTPORT+1,pos >>8);
+    outb(CRTPORT, 15);
+    outb(CRTPORT+1,pos) ;
+
+}
+  
