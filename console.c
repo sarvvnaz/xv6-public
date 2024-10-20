@@ -310,10 +310,14 @@ consoleintr(int (*getc)(void))
         operator = c;
       }
     }
+     if (c ==61 /*=*/){
+       if(op_state == 3){
+         op_state = 4;
+        }
 
     if(c == 63 /*?*/){
       int result = 0;
-      if (op_state == 3){
+      if (op_state == 4){
 
         switch (operator)
         {
