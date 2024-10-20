@@ -314,6 +314,7 @@ consoleintr(int (*getc)(void))
        if(op_state == 3){
          op_state = 4;
         }
+     }
 
     if(c == 63 /*?*/){
       int result = 0;
