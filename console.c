@@ -22,6 +22,11 @@
 #define NUMROW 25
 #define INPUT_BUF 128
 
+int first_num = 0;
+int sec_num = 0;
+int first_start = 0;
+int operator = 0;
+
 static void consputc(int);
 static int capacity = 0;
 static int panicked = 0;
@@ -49,8 +54,6 @@ printint(int xx, int base, int sign)
 
   if(sign && (sign = xx < 0))
     x = -xx;
-  else
-    x = xx;
 
   i = 0;
   do{
@@ -202,6 +205,7 @@ struct {
 } input;
 
 #define C(x)  ((x)-'@')  // Control-x
+int op_state = 0;
 
 void
 consoleintr(int (*getc)(void))
@@ -258,7 +262,6 @@ consoleintr(int (*getc)(void))
     default:
       if (c == '\n') {
         capacity =0;
-        math_process();
       }
       if(c != 0 && input.e-input.r < INPUT_BUF){
         c = (c == '\r') ? '\n' : c;
@@ -272,7 +275,86 @@ consoleintr(int (*getc)(void))
           wakeup(&input.r);
         }
       }
+      
       break;
+    }
+    if (c >= 48 && c <= 57){
+      switch(op_state){
+      case 0 :
+        first_start = input.e;
+        op_state = 1;
+        first_num = first_num * 10 + c - 48;
+        break;
+
+      case 1:
+        first_num = first_num * 10 + c - 48;
+        break;
+
+      case 2:
+        op_state = 3;
+        sec_num = sec_num * 10 + c - 48;
+      break;
+
+      case 3:
+        sec_num = sec_num * 10 + c - 48;
+        break;
+
+      default:
+        break;
+      }
+    }
+
+    if (c == 45 /*-*/|| c == 43 /*+*/|| c == 42 /*mult*/|| c == 37 /*%*/|| c == 47/*divide*/){
+      if (op_state == 1){
+        op_state = 2;
+        operator = c;
+      }
+    }
+
+    if(c == 63 /*?*/){
+      int result = 0;
+      if (op_state == 3){
+
+        switch (operator)
+        {
+        case 45:
+          result = first_num - sec_num;
+          break;
+        
+        case 43:
+          result = first_num + sec_num;
+          break;
+
+        case 42:
+          result = first_num * sec_num;
+          break;
+
+        case 37:
+          result = first_num % sec_num;
+          break;
+
+        case 47:
+          result = first_num / sec_num;
+          break;
+
+        default:
+          break;
+        }
+        
+        while(input.e >= first_start){
+          consputc(BACKSPACE);
+          input.e--;
+        }
+        int sign_ = 0;
+        if (result < 0)
+          sign_ = 1;
+        printint(result, 10, sign_);
+        first_num = 0;
+        sec_num = 0;
+        first_start = 0;
+        operator = 0;
+        op_state = 0;
+      }
     }
   }
   release(&cons.lock);
@@ -375,110 +457,3 @@ setcursor(int direction)
 
 }
   
-char* get_last_input () 
-{
-  static char output[INPUT_BUF];
-  int start = input.e - 1;
-  int end = input.e;
-  while(start >= input.r && input.buf[start % INPUT_BUF] != '\n') 
-  { 
-    start -- ;
-  }
-  if (start < input.r) 
-  {
-    start = input.r;
-  } else {
-    start ++;
-  }
-  int i = 0;
-  while (start < end && i < INPUT_BUF -1) {
-    output[i++] = input.buf[start % INPUT_BUF];
-    start ++;
-  }
-  output[i] = '\0';
-  return output;
-}
-int is_digit (char c) {
-  return c >= '0' && c <= '9';
-}
-void int_to_string(int num, char* str) {
-  int i =0, is_negative = 0;
-  if (num <0) {
-    is_negative = 1;
-    num = -num;
-  }
-  do {
-    str[i++] = (num %10) + '0';
-    num /= 10;
-  } while (num >0);
-  if (is_negative) {
-    str[i++] = '-';
-  }
-  str[i] = '\0';
-  for (int j = 0 ; j < i/2 ; j++) {
-    char temp = str[j];
-    str[j] = str[i-j-1];
-    str[i-j-1] = temp;
-   }
-}
-void math_process () 
-{
-  char *input_str = get_last_input();
-  char *p = input_str;
-
-  while (*p != '\0') {
-    if (is_digit(*p)) {
-      int num1 = 0, num2 = 0;
-      char operator = 0;
-      char *num1_start = p;
-    
-      while(is_digit(*p)) {
-        num1 = num1 * 10 + (*p - '0');
-        p++;
-      }
-      if (*p == '+' || *p == '-' || *p == '*' || *p == '/'){
-        operator = *p;
-        p++;
-      } else {
-        p++;
-        continue;
-      }
-      if (is_digit(*p)) {
-        while(is_digit(*p)) {
-          num2 = num2 *10 + (*p -'0');
-        }
-      }else {
-        p++;
-        continue;
-      }
-        
-      if (*p == '=' && *(p + 1) == '?') {
-        p += 2;
-      
-        int result = 0;
-        switch (operator)
-        {
-          case '+': result = num1 + num2; break;
-          case '-': result = num1 - num2; break;
-          case '*': result = num1 * num2; break;
-          case'/': if (num2 != 0) result = num1 / num2; break;
-          default: continue;
-        }
-        char resullt_str[16];
-
-        int_to_string(result, resullt_str);
-        int shift_len = (p - num1_start) ;
-        memmove(num1_start + strlen(resullt_str), p, strlen(p) + 1);
-        memcpy(num1_start, resullt_str, strlen(resullt_str));
-        p = num1_start + strlen(resullt_str);
-        }
-        else {
-          p++;
-        }   
-        }else {
-          p++;
-        }
-        
-  }
-
-} 
