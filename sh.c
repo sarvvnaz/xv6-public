@@ -136,6 +136,117 @@ getcmd(char *buf, int nbuf)
   printf(2, "$ ");
   memset(buf, 0, nbuf);
   gets(buf, nbuf);
+  //history added here to ->
+  char sindex[1] ;
+  int hindex;
+  int f = open("hIndex.txt",O_RDWR);
+  int r = read(f,sindex,1);
+  hindex = atoi(sindex);
+  switch (hindex){
+  	case 0 : 
+  		unlink("history0.txt");
+  		int f0 = open("history0.txt",O_CREATE|O_RDWR);
+  		write(f0,buf,strlen(buf));
+  		close(f);
+  		unlink("hIndex.txt");
+  		f = open("hIndex.txt",O_CREATE|O_WRONLY);
+  		write(f,"1",1);
+  		close(f0);
+  		break;
+  	case 1 : 
+  		unlink("history1.txt");
+  		int f1 = open("history1.txt",O_CREATE|O_RDWR);
+  		write(f1,buf,strlen(buf));
+  		close(f);
+  		unlink("hIndex.txt");
+  		f = open("hIndex.txt",O_CREATE|O_WRONLY);
+  		write(f,"2",1);
+  		close(f1);  		
+  		break;
+  	case 2 : 
+  		unlink("history2.txt");
+  		int f2 = open("history2.txt",O_CREATE|O_RDWR);
+  		write(f2,buf,strlen(buf));
+  		close(f);
+  		unlink("hIndex.txt");
+  		f = open("hIndex.txt",O_CREATE|O_WRONLY);
+  		write(f,"3",1);
+  		close(f2);
+  		break;
+    	case 3 : 
+  		unlink("history3.txt");
+  		int f3 = open("history3.txt",O_CREATE|O_RDWR);
+  		write(f3,buf,strlen(buf));
+  		close(f);
+  		unlink("hIndex.txt");
+  		f = open("hIndex.txt",O_CREATE|O_WRONLY);
+  		write(f,"4",1);
+  		close(f3);
+  		break;
+    	case 4 : 
+  		unlink("history4.txt");
+  		int f4 = open("history4.txt",O_CREATE|O_RDWR);
+  		write(f4,buf,strlen(buf));
+  		close(f);
+  		unlink("hIndex.txt");
+  		f = open("hIndex.txt",O_CREATE|O_WRONLY);
+  		write(f,"5",1);
+  		close(f4);
+  		break;
+    	case 5 : 
+  		unlink("history5.txt");
+  		int f5 = open("history5.txt",O_CREATE|O_RDWR);
+  		write(f5,buf,strlen(buf));
+  		close(f);
+  		unlink("hIndex.txt");
+  		f = open("hIndex.txt",O_CREATE|O_WRONLY);
+  		write(f,"6",1);
+  		close(f5);
+  		break;
+    	case 6 : 
+  		unlink("history6.txt");
+  		int f6 = open("history6.txt",O_CREATE|O_RDWR);
+  		write(f6,buf,strlen(buf));
+  		close(f);
+  		unlink("hIndex.txt");
+  		f = open("hIndex.txt",O_CREATE|O_WRONLY);
+  		write(f,"7",1);
+  		close(f6);
+  		break;
+    	case 7 : 
+  		unlink("history7.txt");
+  		int f7 = open("history7.txt",O_CREATE|O_RDWR);
+  		write(f7,buf,strlen(buf));
+  		close(f);
+  		unlink("hIndex.txt");
+  		f = open("hIndex.txt",O_CREATE|O_WRONLY);
+  		write(f,"8",1);
+  		close(f7);
+  		break;
+    	case 8 : 
+  		unlink("history8.txt");
+  		int f8 = open("history8.txt",O_CREATE|O_RDWR);
+  		write(f8,buf,strlen(buf));
+  		close(f);
+  		unlink("hIndex.txt");
+  		f = open("hIndex.txt",O_CREATE|O_WRONLY);
+  		write(f,"9",1);
+  		close(f8);
+  		break;
+    	case 9 : 
+  		unlink("history9.txt");
+  		int f9 = open("history9.txt",O_CREATE|O_RDWR);
+  		write(f9,buf,strlen(buf));
+  		close(f);
+  		unlink("hIndex.txt");
+  		f = open("hIndex.txt",O_CREATE|O_WRONLY);
+  		write(f,"0",1);
+  		close(f9);
+  		break;
+  	default:
+  		break;
+  	}
+  close(f);
   if(buf[0] == 0) // EOF
     return -1;
   return 0;
