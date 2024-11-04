@@ -89,3 +89,9 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+void
+sys_create_palindrome(void){
+	int n = myproc()->tf->ebx;
+	cprintf("we were here!!");
+	create_palindrome(n);
+}
