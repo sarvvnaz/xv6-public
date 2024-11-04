@@ -532,3 +532,7 @@ procdump(void)
     cprintf("\n");
   }
 }
+void
+create_palindrome(int num){
+	return;
+}
