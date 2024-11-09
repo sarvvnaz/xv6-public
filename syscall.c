@@ -129,6 +129,7 @@ static int (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_create_palindrome] sys_create_palindrome,
+[SYS_save_pid_and_calls] sys_save_pid_and_calls,
 };
 
 void
