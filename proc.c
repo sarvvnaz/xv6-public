@@ -542,3 +542,7 @@ create_palindrome(int num){
 		}
 	return pali;
 }
+int
+save_pid_and_calls(int mPid,int num){
+	return 0;
+}
