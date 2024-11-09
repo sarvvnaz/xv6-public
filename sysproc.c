@@ -89,9 +89,9 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
-void
+int
 sys_create_palindrome(void){
-	int n = myproc()->tf->ebx;
-	cprintf("we were here!!");
-	create_palindrome(n);
+	int num = myproc()->tf->ebx;
+	cprintf("KERNEL: sys_create_palindrome() is called!\n",num);
+	return create_palindrome(num);
 }
