@@ -95,3 +95,9 @@ sys_create_palindrome(void){
 	cprintf("KERNEL: sys_create_palindrome() is called!\n",num);
 	return create_palindrome(num);
 }
+int
+sys_save_pid_and_calls(void){
+	int num = myproc()->tf->eax;
+	int mPid = myproc()->pid;
+	return save_pid_and_calls(mPid,num);
+}
