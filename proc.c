@@ -532,7 +532,13 @@ procdump(void)
     cprintf("\n");
   }
 }
-void
+int
 create_palindrome(int num){
-	return;
+	int pali =num;
+	while (num>0){
+		int n = num % 10;
+		num = num/10 ;
+		pali= (pali *10) + n;
+		}
+	return pali;
 }
