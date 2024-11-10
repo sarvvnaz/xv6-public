@@ -24,7 +24,6 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int create_palindrome(void);
-int save_pid_and_calls(void);
 // ulib.c
 int stat(const char*, struct stat*);
 char* strcpy(char*, const char*);
