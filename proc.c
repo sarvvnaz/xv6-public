@@ -5,14 +5,12 @@
 #include "mmu.h"
 #include "x86.h"
 #include "proc.h"
-#include "spinlock.h"
 
-struct {
-  struct spinlock lock;
-  struct proc proc[NPROC];
-} ptable;
+
+
 
 static struct proc *initproc;
+
 
 int nextpid = 1;
 extern void forkret(void);
@@ -88,6 +86,9 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  for (int i = 0 ; i < 25; i++){
+  	p->syscalls[i] = 0;
+  }
 
   release(&ptable.lock);
 
@@ -111,7 +112,9 @@ found:
   p->context = (struct context*)sp;
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
-
+  for(int i = 0; i < 25; i++){
+  	p->syscalls[i] = 0 ;
+  }
   return p;
 }
 
@@ -531,4 +534,37 @@ procdump(void)
     }
     cprintf("\n");
   }
+}
+int
+create_palindrome(int num){
+	int pali =num;
+	while (num>0){
+		int n = num % 10;
+		num = num/10 ;
+		pali= (pali *10) + n;
+		}
+	return pali;
+}
+int
+save_pid_and_calls(int mPid,int num){
+	return 0;
+}
+
+int
+list_all_processes(){
+	struct proc* p;
+	acquire(&ptable.lock);
+ 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+		int count = 1;
+ 		if(p->state!=UNUSED){
+ 			int sum = 0;
+ 			for(int i = 0 ; i<25; i++){
+ 				sum+=(p->syscalls[i]);
+ 				}
+			cprintf("%d. pid: %d. syscalls: %d",count,p->pid,sum);
+			release(&ptable.lock);
+ 			}
+	}
+	release(&ptable.lock);
+	return 0;
 }

@@ -6,7 +6,7 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
-
+struct ptable_struct ptable ;
 int
 sys_fork(void)
 {
@@ -88,4 +88,110 @@ sys_uptime(void)
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+int
+sys_create_palindrome(void){
+	int num = myproc()->tf->ebx;
+	cprintf("KERNEL: sys_create_palindrome() is called!\n",num);
+	return create_palindrome(num);
+}
+int sys_sort_syscalls(void) {
+  int pid = -1;
+  if (argint(0, &pid) < 0)
+    return -1;
+  cprintf("pid in sysproc.c w is %d\n", pid); 
+  return sort_process(pid);
+}
+
+ int sys_get_max_invoked_syscall(void){
+  int pid ;
+  if (argint(1,&pid) < 0)
+    return -1 ;
+	cprintf("pid in sysproc.c t is %d\n",pid);
+ 	return get_max_invoked_syscall(pid);
+ }
+int sort_process(int pid) {
+  cprintf("sort_process: Sorting syscalls for pid: %d\n", pid); 
+  struct proc *p;
+  int i, j;
+
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+    if (p->pid == pid) {
+      for (i = 0; i < p->numofsyscalls - 1; i++) {
+        for (j = i + 1; j < p->numofsyscalls; j++) {
+          if (p->syscalls[i] > p->syscalls[j]) {
+            int temp = p->syscalls[i];
+            p->syscalls[i] = p->syscalls[j];
+            p->syscalls[j] = temp;
+          }
+        }
+      }
+      for (i = 0; i < p->numofsyscalls; i++) {
+        cprintf("%d ", p->syscalls[i]);
+      }
+      cprintf("\n");
+
+      return 0;
+    }
+  }
+  return -1;
+}
+int get_max_invoked_syscall(int pid)
+{
+  struct proc *p;
+  int i, j;
+  struct proc* target_p;
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+  {
+    if (p->pid == pid)
+    {
+      target_p=p;
+   
+      for (i = 0; i < p->numofsyscalls - 1; i++)
+      {
+        for (j = i + 1; j < p->numofsyscalls; j++)
+        {
+          if (p->syscalls[i] > p->syscalls[j])
+          {
+            
+            int temp = p->syscalls[i];
+            p->syscalls[i] = p->syscalls[j];
+            p->syscalls[j] = temp;
+          }
+        }
+      }
+     int num[300];
+     memset(num,0,300);
+     for(int i=0;i<300;i++){
+      num[i]=0;
+     }
+     for (int i=0;i<target_p->numofsyscalls;i++){
+      num[target_p->syscalls[i]]++;
+     }
+     int max=-1;
+     int max_index=-1;
+
+     for(int i=0;i<30;i++){
+     if(num[i]>=max && num[i]!=0){
+      max=num[i];
+      max_index=i;
+     }
+     
+     }
+     if(max==-1){
+      cprintf("no syscall found \n");
+      return -1;
+     }
+        for(int i=0;i<30;i++){
+     if(num[i]==max){
+       cprintf("num of the system call is %d and it invoked is %d \n",i,num[i]);
+       return  i;
+     }
+     }
+      // cprintf("num of the system call is %d and it invoked is %d \n",max_index,num[max_index]);
+      return 0; 
+    }
+  }
+  cprintf("Pid not found \n");
+  return -1;
 }
