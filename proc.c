@@ -6,6 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "sleeplock.h"
 
 struct {
   struct spinlock lock;
@@ -531,4 +532,70 @@ procdump(void)
     }
     cprintf("\n");
   }
+}
+
+
+void record_syscall(int syscall_number) {
+    struct proc *p = myproc(); // current proc
+
+    // check syscall exist
+    for (int i = 0; i < p->syscall_count; i++) {
+        if (p->syscalls[i].syscall_number == syscall_number) {
+            p->syscalls[i].count++; 
+            return;
+        }
+    }
+
+    // add new syscall
+    if (p->syscall_count < MAX_SYSCALLS) {
+        p->syscalls[p->syscall_count].syscall_number = syscall_number;
+        p->syscalls[p->syscall_count].count = 1;
+        p->syscall_count++;
+    }
+}
+
+int get_process_by_pid(int pid, struct proc **result_proc) {
+    struct proc *p;
+
+    acquire(&ptable.lock);  // Lock the process table to ensure safe access
+
+    // Loop through the process table to find the process with the specified PID
+    for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+        if (p->pid == pid) {
+            *result_proc = p; 
+            release(&ptable.lock);  // Unlock before returning
+            return 0;
+        }
+    }
+
+    release(&ptable.lock);  // Unlock if no matching process is found
+    return -1;  // Return NULL if no process with the PID is found
+}
+
+int list_all_processes(void) {
+    struct proc *p;
+
+    acquire(&ptable.lock); // Acquire lock to safely access ptable
+
+    // Loop through process table and filter active processes
+    for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+        if (p->state == RUNNABLE || p->state == RUNNING || p->state == SLEEPING) {
+            // Print or store the process info (PID and syscall count)
+            cprintf("Process PID: %d, Syscall Count: %d\n", p->pid, p->syscall_count);
+        }
+    }
+
+    release(&ptable.lock); // Release the lock after done
+    return 0; // Indicate success
+}
+void find_palindrome(int num)
+{
+  int reversed = 0;
+  int temp = num;
+  while (num > 0)
+  {
+    reversed = reversed * 10 + num % 10;
+    num /= 10;
+  }
+  cprintf("Palindrome formed: %d%d\n",temp, reversed);
 }
