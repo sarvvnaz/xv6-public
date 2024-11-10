@@ -95,9 +95,3 @@ sys_create_palindrome(void){
 	cprintf("KERNEL: sys_create_palindrome() is called!\n",num);
 	return create_palindrome(num);
 }
-int
-sys_sort_syscalls(void){
-	int pid = myproc()->tf->ebx;
-	cprintf("pid in sysproc.c is %d\n",pid);
- 	return sort_syscalls(pid);
- }
