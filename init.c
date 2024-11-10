@@ -18,7 +18,7 @@ main(void)
   }
   dup(0);  // stdout
   dup(0);  // stderr
-
+  
   for(;;){
     printf(1, "init: starting sh\n");
     pid = fork();
@@ -31,6 +31,13 @@ main(void)
       printf(1, "init: exec sh failed\n");
       exit();
     }
+    printf(1, "GROUP #16:\n");
+    printf(1, "1. Sarvenaz Salehi\n");
+    printf(1, "2. Arman Karami\n");
+    printf(1, "3. Shayan Saeidi\n");
+    int f = open("hIndex.txt" , O_CREATE | O_RDWR);
+    write(f,"0",1);
+    close(f);
     while((wpid=wait()) >= 0 && wpid != pid)
       printf(1, "zombie!\n");
   }

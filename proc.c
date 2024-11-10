@@ -8,12 +8,11 @@
 #include "spinlock.h"
 #include "sleeplock.h"
 
-struct {
-  struct spinlock lock;
-  struct proc proc[NPROC];
-} ptable;
+
+
 
 static struct proc *initproc;
+
 
 int nextpid = 1;
 extern void forkret(void);
@@ -89,6 +88,9 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  for (int i = 0 ; i < 25; i++){
+  	p->syscalls[i] = 0;
+  }
 
   release(&ptable.lock);
 
@@ -112,7 +114,9 @@ found:
   p->context = (struct context*)sp;
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
-
+  for(int i = 0; i < 25; i++){
+  	p->syscalls[i] = 0 ;
+  }
   return p;
 }
 
@@ -533,8 +537,6 @@ procdump(void)
     cprintf("\n");
   }
 }
-
-
 void record_syscall(int syscall_number) {
     struct proc *p = myproc(); // current proc
 
@@ -588,14 +590,13 @@ int list_all_processes(void) {
     release(&ptable.lock); // Release the lock after done
     return 0; // Indicate success
 }
-void find_palindrome(int num)
-{
-  int reversed = 0;
-  int temp = num;
-  while (num > 0)
-  {
-    reversed = reversed * 10 + num % 10;
-    num /= 10;
-  }
-  cprintf("Palindrome formed: %d%d\n",temp, reversed);
+int
+create_palindrome(int num){
+	int pali =num;
+	while (num>0){
+		int n = num % 10;
+		num = num/10 ;
+		pali= (pali *10) + n;
+		}
+	return pali;
 }
