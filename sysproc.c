@@ -167,10 +167,7 @@ int get_max_invoked_syscall(int pid)
      memset(num,0,300);
      for(int i=0;i<300;i++){
       num[i]=0;
-     // cprintf("%d \n",num[i]);
-      
      }
-     
      for (int i=0;i<target_p->numofsyscalls;i++){
       num[target_p->syscalls[i]]++;
      }
