@@ -104,7 +104,7 @@ extern int sys_wait(void);
 extern int sys_write(void);
 extern int sys_uptime(void);
 extern int sys_create_palindrome(void);
-extern int sys_save_pid_and_calls(void);
+extern int sys_sort_syscalls(void);
 
 static int (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -129,7 +129,7 @@ static int (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_create_palindrome] sys_create_palindrome,
-[SYS_save_pid_and_calls] sys_save_pid_and_calls,
+[SYS_sort_syscalls] sys_sort_syscalls,
 };
 
 void
@@ -137,8 +137,9 @@ syscall(void)
 {
   int num;
   struct proc *curproc = myproc();
-
+  
   num = curproc->tf->eax;
+  curproc->syscalls[num]++;
   if(num > 0 && num < NELEM(syscalls) && syscalls[num]) {
     curproc->tf->eax = syscalls[num]();
   } else {
