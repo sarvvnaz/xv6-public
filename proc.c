@@ -5,15 +5,12 @@
 #include "mmu.h"
 #include "x86.h"
 #include "proc.h"
-#include "spinlock.h"
 
 
-struct {
-  struct spinlock lock;
-  struct proc proc[NPROC];
-} ptable;
+
 
 static struct proc *initproc;
+
 
 int nextpid = 1;
 extern void forkret(void);
@@ -552,36 +549,7 @@ int
 save_pid_and_calls(int mPid,int num){
 	return 0;
 }
-int
-sort_syscalls(int pid){
-	struct proc* p;
-	acquire(&ptable.lock);
-	if( pid<0 || pid>NPROC){
-		release(&ptable.lock);
-		return -1;
-		}
-	int count = 1;
- 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
- 		cprintf("%d pid\n",p->pid);
- 		if((p->pid)== pid&&p->state!=UNUSED){
- 			cprintf("correct pid\n");
- 			int num = 0;
- 			cprintf("%d",num);
- 			for(num = 0 ; num<25; num+=1){
- 				cprintf("looping %d\n",num);
- 				if((p->syscalls[num])>0){
- 					cprintf("%d : %d: %d\n",count, num, p->syscalls[num]);
- 					count+=1;
- 					}
- 				cprintf("%d here\n",p->syscalls[num]);
- 				}
-			release(&ptable.lock);
- 			return 0;
- 			}
-		}
-	release(&ptable.lock);
-	return -1;
-}
+
 int
 list_all_processes(){
 	struct proc* p;

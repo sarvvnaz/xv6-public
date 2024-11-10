@@ -12,8 +12,8 @@
 #include "file.h"
 #include "memlayout.h"
 #include "mmu.h"
-#include "proc.h"
 #include "x86.h"
+#include "proc.h"
 #define leftarrow 0xe4
 #define rightarrow 0xe5
 #define left 1

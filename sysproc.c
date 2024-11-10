@@ -95,46 +95,43 @@ sys_create_palindrome(void){
 	cprintf("KERNEL: sys_create_palindrome() is called!\n",num);
 	return create_palindrome(num);
 }
-int sys_sort_syscalls(void){
-	int pid = myproc()->tf->ebx;
-	cprintf("pid in sysproc.c is %d\n",pid);
- 	return sort_procces(pid);
- }
+int sys_sort_syscalls(void) {
+  int pid = -1;
+  if (argint(0, &pid) < 0)
+    return -1;
+  cprintf("pid in sysproc.c w is %d\n", pid); 
+  return sort_process(pid);
+}
 
  int sys_get_max_invoked_syscall(void){
-	int pid = myproc()->tf->ebx;
-	cprintf("pid in sysproc.c is %d\n",pid);
+  int pid ;
+  if (argint(1,&pid) < 0)
+    return -1 ;
+	cprintf("pid in sysproc.c t is %d\n",pid);
  	return get_max_invoked_syscall(pid);
  }
-int sort_procces(int pid)
-{
+int sort_process(int pid) {
+  cprintf("sort_process: Sorting syscalls for pid: %d\n", pid); 
   struct proc *p;
   int i, j;
-  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-  {
-    if (p->pid == pid)
-    {
-   
-      for (i = 0; i < p->numofsyscalls - 1; i++)
-      {
-        for (j = i + 1; j < p->numofsyscalls; j++)
-        {
-          if (p->syscalls[i] > p->syscalls[j])
-          {
-            
+
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+    if (p->pid == pid) {
+      for (i = 0; i < p->numofsyscalls - 1; i++) {
+        for (j = i + 1; j < p->numofsyscalls; j++) {
+          if (p->syscalls[i] > p->syscalls[j]) {
             int temp = p->syscalls[i];
             p->syscalls[i] = p->syscalls[j];
             p->syscalls[j] = temp;
           }
         }
       }
-      for (i = 0; i < p->numofsyscalls; i++)
-      { 
+      for (i = 0; i < p->numofsyscalls; i++) {
         cprintf("%d ", p->syscalls[i]);
       }
       cprintf("\n");
 
-      return 0; 
+      return 0;
     }
   }
   return -1;

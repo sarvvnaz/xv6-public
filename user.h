@@ -24,6 +24,8 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int create_palindrome(void);
+int sort_syscalls(int pid);
+int get_max_invoked_syscall(int pid);
 // ulib.c
 int stat(const char*, struct stat*);
 char* strcpy(char*, const char*);
