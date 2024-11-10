@@ -96,8 +96,8 @@ sys_create_palindrome(void){
 	return create_palindrome(num);
 }
 int
-sys_save_pid_and_calls(void){
-	int num = myproc()->tf->eax;
-	int mPid = myproc()->pid;
-	return save_pid_and_calls(mPid,num);
-}
+sys_sort_syscalls(void){
+	int pid = myproc()->tf->ebx;
+	cprintf("pid in sysproc.c is %d\n",pid);
+ 	return sort_syscalls(pid);
+ }
