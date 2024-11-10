@@ -88,9 +88,7 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-  for (int i = 0 ; i < 25; i++){
-  	p->syscalls[i] = 0;
-  }
+
 
   release(&ptable.lock);
 
@@ -114,9 +112,7 @@ found:
   p->context = (struct context*)sp;
   memset(p->context, 0, sizeof *p->context);
   p->context->eip = (uint)forkret;
-  for(int i = 0; i < 25; i++){
-  	p->syscalls[i] = 0 ;
-  }
+
   return p;
 }
 
@@ -546,56 +542,4 @@ create_palindrome(int num){
 		pali= (pali *10) + n;
 		}
 	return pali;
-}
-int
-save_pid_and_calls(int mPid,int num){
-	return 0;
-}
-int
-sort_syscalls(int pid){
-	struct proc* p;
-	acquire(&ptable.lock);
-	if( pid<0 || pid>NPROC){
-		release(&ptable.lock);
-		return -1;
-		}
-	int count = 1;
- 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
- 		cprintf("%d pid\n",p->pid);
- 		if((p->pid)== pid&&p->state!=UNUSED){
- 			cprintf("correct pid\n");
- 			int num = 0;
- 			cprintf("%d",num);
- 			for(num = 0 ; num<25; num+=1){
- 				cprintf("looping %d\n",num);
- 				if((p->syscalls[num])>0){
- 					cprintf("%d : %d: %d\n",count, num, p->syscalls[num]);
- 					count+=1;
- 					}
- 				cprintf("%d here\n",p->syscalls[num]);
- 				}
-			release(&ptable.lock);
- 			return 0;
- 			}
-		}
-	release(&ptable.lock);
-	return -1;
-}
-int
-list_all_processes(){
-	struct proc* p;
-	acquire(&ptable.lock);
- 	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-		int count = 1;
- 		if(p->state!=UNUSED){
- 			int sum = 0;
- 			for(int i = 0 ; i<25; i++){
- 				sum+=(p->syscalls[i]);
- 				}
-			cprintf("%d. pid: %d. syscalls: %d",count,p->pid,sum);
-			release(&ptable.lock);
- 			}
-	}
-	release(&ptable.lock);
-	return 0;
 }
