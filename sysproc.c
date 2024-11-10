@@ -163,23 +163,23 @@ int get_max_invoked_syscall(int pid)
           }
         }
       }
-     int count[300];
-     memset(count,0,300);
+     int num[300];
+     memset(num,0,300);
      for(int i=0;i<300;i++){
-      count[i]=0;
-     // cprintf("%d \n",count[i]);
+      num[i]=0;
+     // cprintf("%d \n",num[i]);
       
      }
      
      for (int i=0;i<target_p->numofsyscalls;i++){
-      count[target_p->syscalls[i]]++;
+      num[target_p->syscalls[i]]++;
      }
      int max=-1;
      int max_index=-1;
 
      for(int i=0;i<30;i++){
-     if(count[i]>=max && count[i]!=0){
-      max=count[i];
+     if(num[i]>=max && num[i]!=0){
+      max=num[i];
       max_index=i;
      }
      
@@ -189,12 +189,12 @@ int get_max_invoked_syscall(int pid)
       return -1;
      }
         for(int i=0;i<30;i++){
-     if(count[i]==max){
-       cprintf("num of the system call is %d and it invoked is %d \n",i,count[i]);
+     if(num[i]==max){
+       cprintf("num of the system call is %d and it invoked is %d \n",i,num[i]);
        return  i;
      }
      }
-      // cprintf("num of the system call is %d and it invoked is %d \n",max_index,count[max_index]);
+      // cprintf("num of the system call is %d and it invoked is %d \n",max_index,num[max_index]);
       return 0; 
     }
   }
